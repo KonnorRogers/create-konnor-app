@@ -1,0 +1,83 @@
+{
+  "name": "<%= projectName %>",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/bundle/<%= projectName %>.umd.js",
+  "module": "dist/bundle/<%= projectName %>.module.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    <% if (typescript) { %>
+    "lint": "ts-standard src/",
+    "fix": "ts-standard src/ --fix",
+    <% } else { %>
+    "lint": "standard src/",
+    "fix": "standard src/ --fix",
+    <% } %>
+    "test": "web-test-runner",
+    "test:ci": "pnpm lint && pnpm build && web-test-runner",
+    "test:watch": "web-test-runner --watch",
+    "start": "pnpm clean && web-dev-server",
+    "start:watch": "web-dev-server --watch",
+    "build": "pnpm clean && pnpm fix && rollup -c",
+    "build:watch": "pnpm clean && pnpm fix && rollup -wc",
+    "prepare": "pnpm build",
+    "deploy": "standard-version --release-as",
+    "deploy:beta": "standard-version --prerelease beta",
+    "deploy:patch": "standard-version --release-as patch",
+    "deploy:minor": "standard-version --release-as minor",
+    "deploy:major": "standard-version --release-as major",
+    "push": "git push --follow-tags origin main && pnpm publish"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "types": "dist/src/index.d.ts",
+  "typings": "dist/src/index.d.ts",
+  "devDependencies": {
+    "@esm-bundle/chai": "*",
+    "@open-wc/testing": "*",
+    "@rollup/plugin-node-resolve": "*",
+    <% if (typescript) { %>
+    "@rollup/plugin-typescript": "*",
+    <% } %>
+    "@types/sinon": "*",
+    "@types/sinon-chai": "*",
+    <% if (typescript) { %>
+    "@typescript-eslint/parser": "*",
+    <% } %>
+    "@web/dev-server": "*",
+    "@web/dev-server-esbuild": "*",
+    "@web/test-runner": "*",
+    "@web/test-runner-mocha": "*",
+    "@web/test-runner-playwright": "*",
+    "glob": "*",
+    "eslint": "*",
+    "rollup": "*",
+    "rollup-plugin-gzip": "*",
+    "rollup-plugin-terser": "*",
+    "playwright": "*",
+    <% if (!typescript) { %>
+      "standard": "*",
+    <% } %>
+    <% if (typescript) { %>
+    "ts-standard": "*",
+    "tslib": "*",
+    "typescript": "*",
+    <% } %>
+    "zlib": "*"
+  },
+  "repository": "git@github.com:ParamagicDev/<%= projectName %>.git",
+  "bugs": {
+    "url": "https://github.com/paramagicdev/<%= projectName %>/issues"
+  },
+  "homepage": "https://github.com/paramagicdev/<%= projectName %>",
+  "author": "ParamagicDev <konnor5456@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
