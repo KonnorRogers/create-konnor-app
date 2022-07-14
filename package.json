@@ -4,7 +4,7 @@
   "description": "Template generator for my projects",
   "type": "module",
   "source": "src/index.ts",
-  "main": "dist/index.js",
+  "module": "dist/index.js",
   "exports": "./dist/index.js",
   "types": "./dist/types.d.ts",
   "bin": {
@@ -14,10 +14,10 @@
     "node": ">=14.16"
   },
   "scripts": {
-    "start": "parcel watch",
     "prepare": "pnpm build",
-    "build": "parcel build",
-    "go": "node ./dist/index.js",
+    "build": "tsup src/index.ts --format esm --clean --sourcemap --minify --metafile",
+    "dev": "tsup src/index.ts --format esm --watch --clean --onSuccess \"node dist/index.js\"",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "pnpm build && standard-version --release-as",
     "deploy:beta": "pnpm build && standard-version --prerelease beta",
@@ -29,15 +29,12 @@
   "author": "Konnor Rogers",
   "license": "MIT",
   "devDependencies": {
-    "@parcel/core": "^2.6.2",
-    "@parcel/packager-ts": "2.6.2",
-    "@parcel/transformer-typescript-types": "2.6.2",
     "@types/ejs": "^3.1.1",
     "@types/inquirer": "^8.2.1",
     "@types/node": "^18.0.3",
     "@types/shelljs": "^0.8.11",
-    "parcel": "^2.6.2",
     "standard-version": "^9.5.0",
+    "tsup": "^6.1.3",
     "typescript": "^4.7.4"
   },
   "dependencies": {

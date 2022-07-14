@@ -14,9 +14,11 @@ glob
     entries[key] = file
   });
 
+const input = "src/index.<%= typescript ? 'ts' : 'js' %>"
+
 export default [
   {
-    input: "src/index.js",
+    input,
     plugins: [compressionPlugins()],
     output: [
       {
@@ -46,11 +48,10 @@ export default [
 function basePlugins(tsconfig = "./tsconfig.json") {
   return [
     resolve(),
-
     <% if (typescript) { %>
-      typescript({ tsconfig })
-    <% else { %>
-      // typescript({ tsconfig })
+    typescript({ tsconfig })
+    <% } else { %>
+    // typescript({ tsconfig })
     <% } %>
   ];
 }

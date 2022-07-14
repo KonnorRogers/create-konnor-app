@@ -22,7 +22,6 @@
     "build:watch": "pnpm clean && pnpm fix && rollup -wc",
     "start:example": "web-dev-server",
     "build:example": "npx pnpm build && rm -rf examples/dist && cp -R dist/ examples/dist",
-    "prepare": "pnpm build",
     "deploy": "standard-version --release-as",
     "deploy:beta": "standard-version --prerelease beta",
     "deploy:patch": "standard-version --release-as patch",

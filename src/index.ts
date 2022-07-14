@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import * as fs from "fs";
 import * as path from "path";
-import inquirer from "inquirer";
-import chalk from "chalk";
 import shell from "shelljs";
 import * as ejs from "ejs";
-import * as url from "url";
+import inquirer from "inquirer"
+import chalk from "chalk"
+import * as url from "url"
 
 interface TemplateData {
   projectName: string;
@@ -21,48 +21,50 @@ interface CliOptions {
   documentation: boolean;
 }
 
-const __filename = path.join(process.cwd(), url.fileURLToPath(import.meta.url));
-const __dirname = path.dirname(__filename);
-
-const SKIP_FILES = ["pnpm-lock.yaml", "node_modules", ".template.json"];
+const __filename = url.fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const PKG_ROOT = path.join(__dirname, "../")
 
 function render(content: string, data: TemplateData) {
   return ejs.render(content, data);
 }
 
-const CHOICES = fs.readdirSync(path.resolve(__dirname, "templates"));
-const QUESTIONS = [
-  {
-    name: "template",
-    type: "list",
-    message: "What template would you like to use?",
-    choices: CHOICES,
-  },
-  {
-    name: "typescript",
-    type: "confirm",
-    message: "Would you like to use Typescript? (Y/N)",
-  },
-  {
-    name: "documentation",
-    type: "confirm",
-    message: "Would you like to generate documentation? (Y/N)",
-  },
-  {
-    name: "name",
-    type: "input",
-    message: "Please input a new project name:",
-  },
-];
-
+const SKIP_FILES = ["pnpm-lock.yaml", "node_modules", ".template.json"];
 const CURR_DIR = process.cwd();
+const CHOICES = fs.readdirSync(path.join(PKG_ROOT, "src", "templates"));
 
-inquirer.prompt(QUESTIONS).then((answers) => {
+;(async () => {
+  const QUESTIONS = [
+    {
+      name: "template",
+      type: "list",
+      message: "What template would you like to use?",
+      choices: CHOICES,
+    },
+    {
+      name: "typescript",
+      type: "confirm",
+      message: "Would you like to use Typescript? (Y/N)",
+    },
+    {
+      name: "documentation",
+      type: "confirm",
+      message: "Would you like to generate documentation? (Y/N)",
+    },
+    {
+      name: "name",
+      type: "input",
+      message: "Please input a new project name:",
+    },
+  ];
+
+
+  const answers = await inquirer.prompt(QUESTIONS)
   const projectChoice = answers["template"];
   const projectName = answers["name"];
   const typescript = answers["typescript"];
-  const documentation = answers["bridgetown"];
-  const templatePath = path.join(__dirname, "templates", projectChoice);
+  const documentation = answers["documentation"];
+  const templatePath = path.join(PKG_ROOT, "src", "templates", projectChoice);
   const targetPath = path.join(CURR_DIR, projectName);
 
   const options: CliOptions = {
@@ -78,22 +80,23 @@ inquirer.prompt(QUESTIONS).then((answers) => {
     return;
   }
 
-  createDirectoryContents(templatePath, projectName);
+  createDirectoryContents(templatePath, { projectName, typescript });
 
   postProcess(options);
-});
 
-function createProject(projectPath: string) {
-  if (fs.existsSync(projectPath)) {
-    console.log(
-      chalk.red(`Folder ${projectPath} exists. Delete or use another name.`)
-    );
-    return false;
+  function createProject(projectPath: string) {
+    if (fs.existsSync(projectPath)) {
+      console.log(
+        chalk.red(`Folder ${projectPath} exists. Delete or use another name.`)
+      );
+      return false;
+    }
+    fs.mkdirSync(projectPath);
+
+    return true;
   }
-  fs.mkdirSync(projectPath);
+})()
 
-  return true;
-}
 
 function createDirectoryContents(
   templatePath: string,
@@ -134,18 +137,8 @@ function createDirectoryContents(
 }
 
 function postProcess(options: CliOptions) {
-  const isNode = fs.existsSync(path.join(options.templatePath, "package.json"));
-
+  const bridgetown = options.documentation ? "&& gem install bridgetown && (bridgetown new docs -t erb -c turbo,stimulus || echo 'failed to install bridgetown')" : ""
   shell.cd(options.targetPath);
-  if (isNode) {
-    if (shell.exec("pnpm install").code !== 0) {
-      return false;
-    }
-  }
 
-  if (options.documentation) {
-    shell.exec("bridgetown new -t erb -c turbo,stimulus")
-  }
-
-  return true;
+  shell.exec(`git init && (pnpm install || echo 'failed to install with pnpm') ${bridgetown}`)
 }

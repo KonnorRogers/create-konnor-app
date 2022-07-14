@@ -7,8 +7,8 @@ export default ({
   plugins: [
     <% if (typescript) { %>
       esbuildPlugin({ ts: true })
-    <% } else {
+    <% } else { %>
       esbuildPlugin()
-    <%  } %>
+    <% } %>
   ]
 })
