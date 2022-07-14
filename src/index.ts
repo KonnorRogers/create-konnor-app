@@ -18,6 +18,7 @@ interface CliOptions {
   templatePath: string;
   targetPath: string;
   typescript: boolean;
+  documentation: boolean;
 }
 
 const __filename = path.join(process.cwd(), url.fileURLToPath(import.meta.url));
@@ -43,6 +44,11 @@ const QUESTIONS = [
     message: "Would you like to use Typescript? (Y/N)",
   },
   {
+    name: "documentation",
+    type: "confirm",
+    message: "Would you like to generate documentation? (Y/N)",
+  },
+  {
     name: "name",
     type: "input",
     message: "Please input a new project name:",
@@ -55,6 +61,7 @@ inquirer.prompt(QUESTIONS).then((answers) => {
   const projectChoice = answers["template"];
   const projectName = answers["name"];
   const typescript = answers["typescript"];
+  const documentation = answers["bridgetown"];
   const templatePath = path.join(__dirname, "templates", projectChoice);
   const targetPath = path.join(CURR_DIR, projectName);
 
@@ -64,6 +71,7 @@ inquirer.prompt(QUESTIONS).then((answers) => {
     templatePath,
     targetPath,
     typescript,
+    documentation
   };
 
   if (!createProject(targetPath)) {
@@ -127,12 +135,16 @@ function createDirectoryContents(
 
 function postProcess(options: CliOptions) {
   const isNode = fs.existsSync(path.join(options.templatePath, "package.json"));
+
+  shell.cd(options.targetPath);
   if (isNode) {
-    shell.cd(options.targetPath);
-    const result = shell.exec("pnpm install");
-    if (result.code !== 0) {
+    if (shell.exec("pnpm install").code !== 0) {
       return false;
     }
+  }
+
+  if (options.documentation) {
+    shell.exec("bridgetown new -t erb -c turbo,stimulus")
   }
 
   return true;
