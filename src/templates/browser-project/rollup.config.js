@@ -26,10 +26,13 @@ export default [
         format: "umd",
         name: "<%= projectName %>",
         esModule: false,
+        sourcemap: true,
+        exports: named,
       },
       {
         file: "dist/bundle/<%= projectName %>.module.js",
         format: "es",
+        sourcemap: true,
       }
     ]
   },
@@ -40,6 +43,7 @@ export default [
       {
         dir: "dist",
         format: "es",
+        sourcemap: true
       },
     ],
   },
