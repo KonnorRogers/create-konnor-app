@@ -137,7 +137,7 @@ function createDirectoryContents(
 }
 
 function postProcess(options: CliOptions) {
-  const bridgetown = options.documentation ? "&& gem install bridgetown && (bridgetown new docs -t erb -c turbo,stimulus || echo 'failed to install bridgetown')" : ""
+  const bridgetown = options.documentation ? "&& gem install bridgetown && (bridgetown new docs -t erb -c turbo,stimulus -a https://github.com/ParamagicDev/doxxing-time || echo 'failed to install bridgetown')" : ""
   shell.cd(options.targetPath);
 
   shell.exec(`git init && (pnpm install || echo 'failed to install with pnpm') ${bridgetown}`)
