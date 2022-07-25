@@ -2,7 +2,7 @@
   "name": "<%= projectName %>",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/bundle/<%= projectName %>.umd.js",
+  "main": "dist/bundle/<%= projectName %>.common.js",
   "module": "dist/bundle/<%= projectName %>.module.js",
   "scripts": {
     "clean": "rm -rf dist",
@@ -14,19 +14,24 @@
     "fix": "standard src/ --fix",
     <% } %>
     "test": "web-test-runner",
-    "test:ci": "pnpm lint && pnpm build && web-test-runner",
+    <% if (typescript) { %>
+      "test:ci": "pnpm lint && pnpm build && pnpm build:types && web-test-runner",
+    <% } else { %>
+      "test:ci": "pnpm lint && pnpm build && web-test-runner",
+    <% } %>
     "test:watch": "web-test-runner --watch",
-    "start": "pnpm clean && web-dev-server",
-    "start:watch": "web-dev-server --watch",
-    "build": "pnpm clean && pnpm fix && rollup -c",
-    "build:watch": "pnpm clean && pnpm fix && rollup -wc",
+    "build": "rm -rf dist && node esbuild.config.js",
+    <% if (typescript) {
+    "build:types": "tsc",
+    <% } %>
     "start:example": "web-dev-server",
     "build:example": "npx pnpm build && rm -rf examples/dist && cp -R dist/ examples/dist",
-    "deploy": "standard-version --release-as",
-    "deploy:beta": "standard-version --prerelease beta",
-    "deploy:patch": "standard-version --release-as patch",
-    "deploy:minor": "standard-version --release-as minor",
-    "deploy:major": "standard-version --release-as major",
+    "start": "pnpm build -- --watch",
+    "deploy": "pnpm build && pnpm build:types && standard-version --release-as",
+    "deploy:beta": "pnpm build && pnpm build:types && standard-version --prerelease beta",
+    "deploy:patch": "pnpm build && pnpm build:types && standard-version --release-as patch",
+    "deploy:minor": "pnpm build && pnpm build:types && standard-version --release-as minor",
+    "deploy:major": "pnpm build && pnpm build:types && standard-version --release-as major",
     "push": "git push --follow-tags origin main && pnpm publish"
   },
   "files": [
@@ -38,10 +43,6 @@
   "devDependencies": {
     "@esm-bundle/chai": "*",
     "@open-wc/testing": "*",
-    "@rollup/plugin-node-resolve": "*",
-    <% if (typescript) { %>
-    "@rollup/plugin-typescript": "*",
-    <% } %>
     "@types/sinon": "*",
     "@types/sinon-chai": "*",
     <% if (typescript) { %>
@@ -52,12 +53,11 @@
     "@web/test-runner": "*",
     "@web/test-runner-mocha": "*",
     "@web/test-runner-playwright": "*",
+    "esbuild": "*",
     "glob": "*",
     "eslint": "*",
-    "rollup": "*",
-    "rollup-plugin-gzip": "*",
-    "rollup-plugin-terser": "*",
     "playwright": "*",
+    "sinon": "*",
     <% if (!typescript) { %>
       "standard": "*",
     <% } %>
@@ -66,7 +66,6 @@
     "tslib": "*",
     "typescript": "*",
     <% } %>
-    "zlib": "*"
   },
   "repository": "git@github.com:ParamagicDev/<%= projectName %>.git",
   "bugs": {
