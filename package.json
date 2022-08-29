@@ -1,6 +1,6 @@
 {
   "name": "create-konnor-project",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Template generator for my projects",
   "type": "module",
   "source": "src/index.ts",
