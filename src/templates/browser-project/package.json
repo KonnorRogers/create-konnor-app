@@ -21,7 +21,7 @@
     <% } %>
     "test:watch": "web-test-runner --watch",
     "build": "rm -rf dist && node esbuild.config.js",
-    <% if (typescript) { %?
+    <% if (typescript) { %>
     "build:types": "tsc",
     <% } %>
     "start:example": "web-dev-server",
