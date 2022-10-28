@@ -1,0 +1,65 @@
+{
+  "name": "<%= projectName %>",
+  "version": "1.0.0",
+  "type": "module",
+  "source": "src/index.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf dist",
+    <% if (typescript) { %>
+    "lint": "ts-standard src/",
+    "fix": "ts-standard src/ --fix",
+    <% } else { %>
+    "lint": "standard src/",
+    "fix": "standard src/ --fix",
+    <% } %>
+    "test": "web-test-runner",
+    <% if (typescript) { %>
+      "test:ci": "pnpm lint && pnpm build && web-test-runner",
+    <% } else { %>
+      "test:ci": "pnpm lint && pnpm build && web-test-runner",
+    <% } %>
+    "test:watch": "web-test-runner --watch",
+    "build": "pnpm run clean && tsup src/index.ts --format esm,cjs --clean --sourcemap --minify --metafile --dts",
+    "start": "pnpm run clean && tsup src/index.ts --format esm,cjs --watch --clean --onSuccess \"node dist/index.js\"",
+    <% if (typescript) { %>
+    "build:types": "tsc",
+    <% } %>
+    "start": "pnpm build -- --watch",
+    "deploy": "pnpm build && standard-version --release-as",
+    "deploy:beta": "pnpm build && standard-version --prerelease beta",
+    "deploy:patch": "pnpm build && standard-version --release-as patch",
+    "deploy:minor": "pnpm build && standard-version --release-as minor",
+    "deploy:major": "pnpm build && standard-version --release-as major",
+    "push": "git push --follow-tags origin main && pnpm publish"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "devDependencies": {
+		"standard-version": "^9.5.0",
+    <% if (typescript) { %>
+    "tslib": "^2.4.0",
+    "tsup": "^6.1.3",
+    "typescript": "^4.7.4",
+    <% } %>
+  },
+  "repository": "git@github.com:KonnorRogers/<%= projectName %>.git",
+  "bugs": {
+    "url": "https://github.com/KonnorRogers/<%= projectName %>/issues"
+  },
+  "homepage": "https://github.com/KonnorRogers/<%= projectName %>",
+  "author": "Konnor Rogers <konnor5456@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
